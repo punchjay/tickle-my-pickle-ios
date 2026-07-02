@@ -1,0 +1,11 @@
+# Secrets
+Secrets.xcconfig
+
+# Xcode / generated project
+*.xcodeproj/
+DerivedData/
+build/
+.artifacts/
+
+# macOS
+.DS_Store
