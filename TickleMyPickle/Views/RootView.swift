@@ -53,6 +53,7 @@ struct RootView: View {
             onSelectCourt: viewModel.handleCourtSelect,
           )
           searchColumn
+            .frame(maxWidth: 420)
             .padding(.horizontal, 12)
             .padding(.top, 8)
         }
