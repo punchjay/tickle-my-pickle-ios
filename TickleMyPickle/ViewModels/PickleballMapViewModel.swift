@@ -26,18 +26,33 @@ final class PickleballMapViewModel {
   /// list's entrance transition on every search.
   private(set) var searchSeq = 0
   private(set) var loading = false
-  var error: String? = Config.hasApiKey ? nil : AppCopy.Errors.missingApiKey
+  var error: String?
 
-  let hasApiKey = Config.hasApiKey
+  let hasApiKey: Bool
 
-  private let locationService = LocationService()
+  private let places: any PlacesProviding
+  private let locationProvider: any LocationProviding
+
+  /// Dependencies default to the live implementations, so production callers
+  /// (`RootView`) construct this with no arguments; tests inject stubs and a
+  /// forced `hasApiKey` so the search flow isn't gated by the build's key.
+  init(
+    places: any PlacesProviding = GooglePlacesService(),
+    locationProvider: any LocationProviding = LocationService(),
+    hasApiKey: Bool = Config.hasApiKey,
+  ) {
+    self.places = places
+    self.locationProvider = locationProvider
+    self.hasApiKey = hasApiKey
+    self.error = hasApiKey ? nil : AppCopy.Errors.missingApiKey
+  }
 
   /// Shared tail of search + geolocate: run the Places text search around a
   /// resolved location, map results, recenter, and surface errors.
   private func searchNearby(_ location: LatLng) async {
     defer { loading = false }
     do {
-      let results = try await GooglePlacesClient.searchCourts(near: location)
+      let results = try await places.searchCourts(near: location)
       if results.isEmpty {
         courts = []
         error = AppCopy.Errors.noCourtsFound
@@ -66,7 +81,7 @@ final class PickleballMapViewModel {
     loading = true
     error = nil
     do {
-      guard let location = try await GooglePlacesClient.geocode(query: query) else {
+      guard let location = try await places.geocode(query: query) else {
         loading = false
         error = AppCopy.Errors.locationNotFound
         return
@@ -87,7 +102,7 @@ final class PickleballMapViewModel {
     guard hasApiKey else { return }
     loading = true
     error = nil
-    guard let coordinate = await locationService.requestOneShotLocation() else {
+    guard let coordinate = await locationProvider.requestOneShotLocation() else {
       loading = false
       error = AppCopy.Errors.geolocationDenied
       return

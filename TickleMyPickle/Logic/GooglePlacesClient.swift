@@ -18,6 +18,28 @@ enum GooglePlacesError: Error, LocalizedError {
   }
 }
 
+/// Seam over the Google data layer so `PickleballMapViewModel` can be driven
+/// by a stub in tests instead of hitting the network. The live implementation
+/// (`GooglePlacesService`) forwards to `GooglePlacesClient`.
+protocol PlacesProviding: Sendable {
+  func geocode(query: String) async throws -> LatLng?
+  func searchCourts(near location: LatLng) async throws -> [Court]
+}
+
+/// Live `PlacesProviding`, backed by the Google REST endpoints. Holds the
+/// `URLSession` so the same stubbing the client tests use stays available.
+struct GooglePlacesService: PlacesProviding {
+  var session: URLSession = .shared
+
+  func geocode(query: String) async throws -> LatLng? {
+    try await GooglePlacesClient.geocode(query: query, session: session)
+  }
+
+  func searchCourts(near location: LatLng) async throws -> [Court] {
+    try await GooglePlacesClient.searchCourts(near: location, session: session)
+  }
+}
+
 enum GooglePlacesClient {
   /// ~10 miles.
   static let searchRadiusMeters: Double = 16093
