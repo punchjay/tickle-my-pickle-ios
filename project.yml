@@ -59,3 +59,10 @@ schemes:
       targets: [TickleMyPickleTests]
     run:
       config: Debug
+      # Silence noisy OS-level console chatter (Network.framework, MapKit,
+      # CAMetalLayer first-layout logs) so real app output stands out. This
+      # only affects the Run action in Xcode; it does not change the build.
+      environmentVariables:
+        - variable: OS_ACTIVITY_MODE
+          value: disable
+          isEnabled: true
