@@ -11,32 +11,45 @@ struct RootView: View {
   private var hasResults: Bool { !viewModel.courts.isEmpty }
 
   var body: some View {
-    Group {
-      if hasResults {
-        resultsLayout
-      } else {
-        landingLayout
+    GeometryReader { proxy in
+      Group {
+        if hasResults {
+          resultsLayout
+        } else {
+          landingLayout
+        }
+      }
+      .background(Semantic.bg)
+      // Translucent scrim over the status bar / top menu bar so its content
+      // stays legible over the backdrop (landing) and the map (results).
+      .overlay(alignment: .top) {
+        Semantic.bg.opacity(0.6)
+          .frame(height: proxy.safeAreaInsets.top)
+          .frame(maxWidth: .infinity)
+          .ignoresSafeArea(edges: .top)
       }
     }
-    .background(Semantic.bg)
   }
 
   private var landingLayout: some View {
-    ZStack {
-      StripedBackdropView()
-        .ignoresSafeArea()
+    GeometryReader { geo in
+      ZStack {
+        StripedBackdropView()
+          .ignoresSafeArea()
 
-      VStack(spacing: 8) {
-        HeaderCardView()
-        searchColumn
-      }
-      .padding(.horizontal, 24)
-      .frame(maxWidth: 420)
+        // Header card + search: width min(400, screen - 32), stacked with an
+        // 8pt gap, with the block's midpoint at 40% of the height — matching
+        // the web app's hero placement (Ms: top 40%, translate -50%).
+        VStack(spacing: 8) {
+          HeaderCardView()
+          searchColumn
+        }
+        .frame(width: min(400, geo.size.width - 32))
+        .position(x: geo.size.width / 2, y: geo.size.height * 0.4)
 
-      VStack {
-        Spacer()
+        // Footer capsule pinned 16pt from the bottom, centered (web: Xo).
         FooterCreditView()
-          .padding(.bottom, 16)
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
       }
     }
   }
