@@ -2,9 +2,9 @@ import SwiftUI
 
 struct HeaderCardView: View {
   var body: some View {
-    VStack(spacing: 6) {
+    VStack(spacing: 2) {
       Text(AppCopy.App.wordmark)
-        .font(AppFont.accent(34))
+        .font(AppFont.accent(38))
         .foregroundStyle(Palette.courtBlue)
       Text(AppCopy.App.tagline)
         .font(AppFont.body(16))
