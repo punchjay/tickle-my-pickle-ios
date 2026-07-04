@@ -30,6 +30,10 @@ xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/TickleMyP
 xcrun simctl launch booted com.punchjay.ticklemypickle
 ```
 
+For a fast edit loop, `./refresh.sh` wraps build + install + relaunch (fails fast
+on build errors so it never relaunches a stale app). Override the target sim with
+`SIM="iPhone 17 Pro" ./refresh.sh`.
+
 Tests: `xcodebuild test -project TickleMyPickle.xcodeproj -scheme TickleMyPickle -destination '...'`
 
 ## Google Maps API key (the setup that's easy to get wrong)
