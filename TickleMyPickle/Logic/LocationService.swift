@@ -1,5 +1,12 @@
 import CoreLocation
 
+/// Seam over the location source so `PickleballMapViewModel`'s geolocate flow
+/// can be tested with a stub. `LocationService` is the live implementation.
+@MainActor
+protocol LocationProviding {
+  func requestOneShotLocation() async -> CLLocationCoordinate2D?
+}
+
 /// One-shot "get current location" wrapper around the classic
 /// CLLocationManagerDelegate API. Deliberately not CLLocationUpdate
 /// .liveUpdates() (iOS 17's AsyncSequence-based API): that one has a known
@@ -8,7 +15,7 @@ import CoreLocation
 /// is itself already a one-shot primitive and is what `xcrun simctl location
 /// <device> set <lat>,<lon>` is built to drive for scripted verification.
 @MainActor
-final class LocationService: NSObject, CLLocationManagerDelegate {
+final class LocationService: NSObject, CLLocationManagerDelegate, LocationProviding {
   private let manager = CLLocationManager()
   private var authorizationContinuation: CheckedContinuation<Void, Never>?
   private var locationContinuation: CheckedContinuation<CLLocationCoordinate2D?, Never>?
