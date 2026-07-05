@@ -5,7 +5,7 @@ import SwiftUI
 /// screen vertically into a MapKit map (slightly taller) on top and a results
 /// list below.
 struct RootView: View {
-  @State private var viewModel = PickleballMapViewModel()
+  @State private var viewModel = PickleballMapViewModel.forLaunch()
   @State private var favoritesStore = FavoritesStore()
 
   private var hasResults: Bool { !viewModel.courts.isEmpty }

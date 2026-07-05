@@ -113,9 +113,12 @@ xcodebuild test -project TickleMyPickle.xcodeproj -scheme TickleMyPickle \
 
 Covers the REST client (stubbed `URLSession`), the view-model search/geolocate
 state machine (injected fakes), favorites persistence, and amenity inference.
+XCUITests drive the landing → results flow end-to-end against in-app stub data
+(launched with `-uiTestStubData`), so they need no network, key, or location
+permission.
 
 ## Roadmap
 
 - [x] Bundle real font files (Bebas Neue, DM Sans, Fredoka)
 - [x] Real app icon
-- [ ] UI tests for the landing → results flow
+- [x] UI tests for the landing → results flow
