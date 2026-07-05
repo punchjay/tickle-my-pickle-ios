@@ -58,14 +58,26 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
     info:
       path: TickleMyPickleTests/Info.plist
+  TickleMyPickleUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: TickleMyPickleUITests
+    dependencies:
+      - target: TickleMyPickle
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   TickleMyPickle:
     build:
       targets:
         TickleMyPickle: all
         TickleMyPickleTests: [test]
+        TickleMyPickleUITests: [test]
     test:
-      targets: [TickleMyPickleTests]
+      targets: [TickleMyPickleTests, TickleMyPickleUITests]
     run:
       config: Debug
       # Silence noisy OS-level console chatter (Network.framework, MapKit,
