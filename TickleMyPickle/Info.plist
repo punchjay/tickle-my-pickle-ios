@@ -24,6 +24,14 @@
 	<string>$(GOOGLE_MAPS_REST_API_KEY)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to find pickleball courts near you.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>BebasNeue-Regular.ttf</string>
+		<string>DMSans-Regular.ttf</string>
+		<string>DMSans-Medium.ttf</string>
+		<string>DMSans-Bold.ttf</string>
+		<string>Fredoka-SemiBold.ttf</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

@@ -2,11 +2,11 @@ import SwiftUI
 import UIKit
 
 /// Font helpers mirroring the original theme's `fonts` tokens (display =
-/// Bebas Neue, body = DM Sans, accent = Fredoka). The real font files aren't
-/// bundled yet (see README "Known follow-ups") -- until `Resources/Fonts/`
-/// has real .ttf files and they're registered via Info.plist `UIAppFonts`,
-/// every helper here falls back to a `.rounded`-design system font so the app
-/// still looks intentional rather than defaulting to plain system text.
+/// Bebas Neue, body = DM Sans, accent = Fredoka). The real .ttf files live in
+/// `Resources/Fonts/` and are registered via Info.plist `UIAppFonts` (see
+/// `project.yml`). Each helper still falls back to a `.rounded`-design system
+/// font if a face fails to register, so the app looks intentional rather than
+/// defaulting to plain system text.
 enum AppFont {
   private static func isRegistered(_ name: String) -> Bool {
     UIFont(name: name, size: 12) != nil

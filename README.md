@@ -116,8 +116,6 @@ state machine (injected fakes), favorites persistence, and amenity inference.
 
 ## Roadmap
 
-- [ ] Bundle real font files (Bebas Neue, DM Sans, Fredoka) into
-      `Resources/Fonts/` and wire into `Support/Fonts.swift` — ships with a
-      system-font fallback until then
+- [x] Bundle real font files (Bebas Neue, DM Sans, Fredoka)
 - [x] Real app icon
 - [ ] UI tests for the landing → results flow
