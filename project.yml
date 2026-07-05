@@ -36,6 +36,15 @@ targets:
         UILaunchScreen: {}
         NSLocationWhenInUseUsageDescription: "We use your location to find pickleball courts near you."
         GoogleMapsRestAPIKey: "$(GOOGLE_MAPS_REST_API_KEY)"
+        # Bundled fonts (see Resources/Fonts/). XcodeGen flattens the group into
+        # the bundle root, so these are bare filenames. Support/Fonts.swift looks
+        # them up by PostScript name and falls back to system fonts if absent.
+        UIAppFonts:
+          - BebasNeue-Regular.ttf
+          - DMSans-Regular.ttf
+          - DMSans-Medium.ttf
+          - DMSans-Bold.ttf
+          - Fredoka-SemiBold.ttf
   TickleMyPickleTests:
     type: bundle.unit-test
     platform: iOS
