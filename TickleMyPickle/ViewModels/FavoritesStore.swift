@@ -12,6 +12,14 @@ final class FavoritesStore {
   private(set) var favorites: [Court] = []
 
   init() {
+    #if DEBUG
+      // Under UI tests, start from a clean slate: favorites persist in
+      // UserDefaults across launches, so a previous run's saves would
+      // otherwise leak into this one and break determinism.
+      if ProcessInfo.processInfo.arguments.contains(uiTestStubArgument) {
+        UserDefaults.standard.removeObject(forKey: Self.storageKey)
+      }
+    #endif
     favorites = Self.readFavorites()
   }
 

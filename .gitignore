@@ -6,6 +6,7 @@ Secrets.xcconfig
 DerivedData/
 build/
 .artifacts/
+*.xcresult/
 
 # macOS
 .DS_Store
