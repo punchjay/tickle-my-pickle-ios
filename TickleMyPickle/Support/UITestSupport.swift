@@ -45,6 +45,25 @@ extension PickleballMapViewModel {
           rating: 4.5, userRatingCount: 96, isOpen: false, types: ["gym"],
           location: LatLng(lat: 47.6806, lng: -122.3270),
         ),
+        // The three below round out store screenshots (fuller list, more pins,
+        // varied amenity badges). Names are chosen to exercise the inference
+        // in `Amenities`: "Indoor"/"Rec Center" → Indoor, "Lighted" → Lighted,
+        // park type → Outdoor + Free.
+        Court(
+          id: "stub-3", name: "Salmon Bay Indoor Rec Center", address: "2001 NW Market St",
+          rating: 4.8, userRatingCount: 212, isOpen: true, types: ["gym"],
+          location: LatLng(lat: 47.6689, lng: -122.3818),
+        ),
+        Court(
+          id: "stub-4", name: "Golden Gardens Lighted Courts", address: "8498 Seaview Pl NW",
+          rating: 4.6, userRatingCount: 74, isOpen: true, types: ["park"],
+          location: LatLng(lat: 47.6907, lng: -122.4026),
+        ),
+        Court(
+          id: "stub-5", name: "Loyal Heights Playfield", address: "2101 NW 77th St",
+          rating: 4.4, userRatingCount: 58, isOpen: true, types: ["park"],
+          location: LatLng(lat: 47.6841, lng: -122.3789),
+        ),
       ]
     }
   }
