@@ -25,6 +25,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.punchjay.ticklemypickle
         PRODUCT_NAME: TickleMyPickle
+        # DEVELOPMENT_TEAM comes from Secrets.xcconfig (uncommented once the
+        # Apple Developer enrollment clears); simulator builds don't need it.
+        CODE_SIGN_STYLE: Automatic
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
         MARKETING_VERSION: "1.0.0"

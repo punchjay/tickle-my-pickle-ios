@@ -1,6 +1,9 @@
 # Secrets
 Secrets.xcconfig
 
+# Personal working notes for Claude Code (kept local only)
+CLAUDE.md
+
 # Xcode / generated project
 *.xcodeproj/
 DerivedData/
