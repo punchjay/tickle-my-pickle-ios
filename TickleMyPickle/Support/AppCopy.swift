@@ -6,6 +6,16 @@ enum AppCopy {
     static let tagline = "Find pickleball courts near you"
   }
 
+  enum Footer {
+    /// Copyright holder — the LLC the app ships under, not the wordmark.
+    static let credit = "Denova"
+    static let email = "punchjay@gmail.com"
+    static let emailSubject = "Hello!"
+    static let contactLabel = "Get in touch"
+    static let githubURL = "https://github.com/punchjay"
+    static let githubLabel = "GitHub profile"
+  }
+
   enum Search {
     static let placeholder = "Search City, ZIP, or Hood"
     static let submitLabel = "Search"
