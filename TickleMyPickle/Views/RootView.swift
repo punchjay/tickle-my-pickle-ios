@@ -23,7 +23,7 @@ struct RootView: View {
       // Translucent scrim over the status bar / top menu bar so its content
       // stays legible over the backdrop (landing) and the map (results).
       .overlay(alignment: .top) {
-        Semantic.bg.opacity(0.6)
+        Semantic.bg.opacity(0.75)
           .frame(height: proxy.safeAreaInsets.top)
           .frame(maxWidth: .infinity)
           .ignoresSafeArea(edges: .top)
