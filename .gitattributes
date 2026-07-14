@@ -1,0 +1,4 @@
+# App Store artifacts (screenshots, review pack with inline base64 images)
+# aren't app source — keep them out of GitHub's language stats so the bar
+# reflects the Swift codebase instead of the ~1.4 MB review-pack.html.
+appstore/** linguist-documentation
