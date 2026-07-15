@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>GoogleMapsRestAPIKey</key>
 	<string>$(GOOGLE_MAPS_REST_API_KEY)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to find pickleball courts near you.</string>
 	<key>UIAppFonts</key>

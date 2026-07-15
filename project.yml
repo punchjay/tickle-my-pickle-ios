@@ -40,6 +40,10 @@ targets:
       properties:
         CFBundleDisplayName: Tickle My Pickle
         UILaunchScreen: {}
+        # App uses only standard HTTPS/TLS (exempt encryption), so declare it up
+        # front — otherwise every TestFlight/App Store build stalls in "Missing
+        # Compliance" until the export-compliance question is answered by hand.
+        ITSAppUsesNonExemptEncryption: false
         NSLocationWhenInUseUsageDescription: "We use your location to find pickleball courts near you."
         GoogleMapsRestAPIKey: "$(GOOGLE_MAPS_REST_API_KEY)"
         # Bundled fonts (see Resources/Fonts/). XcodeGen flattens the group into
