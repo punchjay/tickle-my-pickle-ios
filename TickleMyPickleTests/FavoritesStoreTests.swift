@@ -4,7 +4,9 @@ import XCTest
 
 @MainActor
 final class FavoritesStoreTests: XCTestCase {
-  private static let storageKey = "tmp:favorites"
+  // `nonisolated` because setUp/tearDown override nonisolated XCTestCase methods
+  // and so can't inherit the class's @MainActor isolation.
+  private nonisolated static let storageKey = "tmp:favorites"
 
   override func setUp() {
     super.setUp()

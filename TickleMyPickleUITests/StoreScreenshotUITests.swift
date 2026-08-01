@@ -17,6 +17,7 @@ import XCTest
 ///     -resultBundlePath screenshots.xcresult
 ///   xcrun xcresulttool export attachments --path screenshots.xcresult \
 ///     --output-path screenshots/
+@MainActor
 final class StoreScreenshotUITests: XCTestCase {
   override func setUp() {
     continueAfterFailure = false
