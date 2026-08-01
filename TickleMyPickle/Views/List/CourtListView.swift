@@ -23,6 +23,13 @@ struct CourtListView: View {
 
   var body: some View {
     VStack(spacing: 0) {
+      // Empty Saved: push the tabs and the message down so they ride low in
+      // the panel, the way the web sidebar sits when it shrinks to its
+      // message. Nothing else about the layout moves — the map is untouched.
+      if tab == .saved && favorites.isEmpty {
+        Spacer(minLength: 0)
+      }
+
       HStack(spacing: 4) {
         tabButton(.nearby, label: "\(AppCopy.CourtList.nearbyTab) (\(courts.count))")
         tabButton(.saved, label: "\(AppCopy.CourtList.savedTab) (\(favorites.count))")
