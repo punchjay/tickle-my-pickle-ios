@@ -5,6 +5,7 @@ import XCTest
 /// `-uiTestStubData` argument (see `Support/UITestSupport.swift`), which swaps
 /// the live Google/location layers for deterministic stubs — so these tests need
 /// no network, no API key, and no location permission.
+@MainActor
 final class LandingFlowUITests: XCTestCase {
   override func setUp() {
     continueAfterFailure = false
