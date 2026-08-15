@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+
+      # The real key lives in a gitignored Secrets.xcconfig. Tests never call
+      # Google -- the unit tests are pure logic and the UI tests run against the
+      # -uiTestStubData stubs -- so the placeholder from the example file is
+      # enough to satisfy the Info.plist substitution and let the build link.
+      - name: Stub out Secrets.xcconfig
+        run: cp Secrets.xcconfig.example Secrets.xcconfig
+
+      - name: Generate project
+        run: xcodegen generate
+
+      # Runner images change their Xcode (and therefore their simulator set)
+      # without notice, so resolve a booted-capable iPhone at run time rather
+      # than pinning a name like "iPhone 17" that can vanish under us.
+      - name: Pick a simulator
+        run: |
+          xcrun simctl list devices available --json > devices.json
+          python3 - <<'PY' > sim.env
+          import json, os, re
+
+          runtimes = json.load(open("devices.json"))["devices"]
+
+          def version(runtime):
+              match = re.search(r"iOS-(\d+)-(\d+)", runtime)
+              return tuple(map(int, match.groups())) if match else (0, 0)
+
+          for runtime in sorted(runtimes, key=version, reverse=True):
+              phones = [d for d in runtimes[runtime] if d["name"].startswith("iPhone")]
+              if phones:
+                  print(f"SIMULATOR_UDID={phones[-1]['udid']}")
+                  print(f"SIMULATOR_NAME={phones[-1]['name']} ({runtime.split('.')[-1]})")
+                  break
+          else:
+              raise SystemExit("no iPhone simulator available on this runner")
+          PY
+          cat sim.env
+          cat sim.env >> "$GITHUB_ENV"
+          rm devices.json sim.env
+
+      - name: Test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project TickleMyPickle.xcodeproj \
+            -scheme TickleMyPickle \
+            -configuration Debug \
+            -destination "id=$SIMULATOR_UDID" \
+            -derivedDataPath build \
+            | xcbeautify
