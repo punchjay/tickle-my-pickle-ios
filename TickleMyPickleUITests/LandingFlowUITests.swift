@@ -49,10 +49,7 @@ final class LandingFlowUITests: XCTestCase {
     XCTAssertTrue(nearMe.waitForExistence(timeout: 5), "Near me button should be present")
     nearMe.tap()
 
-    // Matches on the label prefix so the "(n)" count can change freely.
-    let savedTab = app.buttons.matching(
-      NSPredicate(format: "label BEGINSWITH 'Saved ('"),
-    ).firstMatch
+    let savedTab = app.buttons["Saved"].firstMatch
     XCTAssertTrue(savedTab.waitForExistence(timeout: 5), "Saved tab should be present")
     XCTAssertFalse(savedTab.isEnabled, "Saved tab should be disabled with no saved courts")
 

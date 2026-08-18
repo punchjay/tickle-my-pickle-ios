@@ -24,10 +24,10 @@ struct CourtListView: View {
   var body: some View {
     VStack(spacing: 0) {
       HStack(spacing: 4) {
-        tabButton(.nearby, label: "\(AppCopy.CourtList.nearbyTab) (\(courts.count))")
+        tabButton(.nearby, label: AppCopy.CourtList.nearbyTab)
         tabButton(
           .saved,
-          label: "\(AppCopy.CourtList.savedTab) (\(favorites.count))",
+          label: AppCopy.CourtList.savedTab,
           // Nothing to show with no saves, so the tab is a dead end — dim it
           // and let the star on each row be the way in.
           disabled: favorites.isEmpty,
