@@ -51,9 +51,7 @@ final class StoreScreenshotUITests: XCTestCase {
     // from saved", so firstMatch advances to the next unsaved row).
     app.buttons["Save court"].firstMatch.tap()
     app.buttons["Save court"].firstMatch.tap()
-    let savedTab = app.buttons.matching(
-      NSPredicate(format: "label BEGINSWITH 'Saved ('"),
-    ).firstMatch
+    let savedTab = app.buttons["Saved"].firstMatch
     XCTAssertTrue(savedTab.waitForExistence(timeout: 5), "Saved tab should be present")
     savedTab.tap()
     XCTAssertTrue(
