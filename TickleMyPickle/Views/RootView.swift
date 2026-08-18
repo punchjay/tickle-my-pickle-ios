@@ -46,10 +46,6 @@ struct RootView: View {
         }
         .frame(width: min(400, geo.size.width - 32))
         .position(x: geo.size.width / 2, y: geo.size.height * 0.4)
-
-        // Footer capsule pinned 16pt from the bottom, centered (web: Xo).
-        FooterCreditView()
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
       }
     }
   }
