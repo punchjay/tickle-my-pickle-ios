@@ -64,7 +64,8 @@ struct RootView: View {
           searchColumn
             .frame(maxWidth: 420)
             .padding(.horizontal, 12)
-            .padding(.top, 8)
+            // Sits 5pt lower than it used to, clearing the status-bar scrim.
+            .padding(.top, 13)
         }
         // Matches the original app's MapArea flex 1.1 / ListArea flex 1 ratio.
         .frame(height: geometry.size.height * (1.1 / 2.1))
