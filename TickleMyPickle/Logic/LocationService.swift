@@ -1,11 +1,36 @@
 import CoreLocation
 
+/// Outcome of a one-shot location request, kept distinct so callers can tell
+/// "permission denied" apart from "permission granted but no fix was
+/// obtained" (GPS timeout, airplane mode, no simulated location set, etc.) --
+/// collapsing both to `nil` produced a misleading "access denied" message for
+/// failures that had nothing to do with permissions.
+enum LocationResult {
+  case success(CLLocationCoordinate2D)
+  case denied
+  case unavailable
+}
+
 /// Seam over the location source so `PickleballMapViewModel`'s geolocate flow
 /// can be tested with a stub. `LocationService` is the live implementation.
 @MainActor
 protocol LocationProviding {
-  func requestOneShotLocation() async -> CLLocationCoordinate2D?
+  func requestOneShotLocation() async -> LocationResult
 }
+
+/// Seam over `CLLocationManager` itself (as opposed to `LocationProviding`,
+/// which seams over the whole one-shot flow) so `LocationService`'s
+/// authorization/delegate bookkeeping can be tested with a fake manager
+/// instead of the real, permission-prompting, simulator-dependent one.
+@MainActor
+protocol CLLocationManagerProtocol: AnyObject {
+  var delegate: CLLocationManagerDelegate? { get set }
+  var authorizationStatus: CLAuthorizationStatus { get }
+  func requestWhenInUseAuthorization()
+  func requestLocation()
+}
+
+extension CLLocationManager: CLLocationManagerProtocol {}
 
 /// One-shot "get current location" wrapper around the classic
 /// CLLocationManagerDelegate API. Deliberately not CLLocationUpdate
@@ -16,18 +41,17 @@ protocol LocationProviding {
 /// <device> set <lat>,<lon>` is built to drive for scripted verification.
 @MainActor
 final class LocationService: NSObject, CLLocationManagerDelegate, LocationProviding {
-  private let manager = CLLocationManager()
+  private let manager: any CLLocationManagerProtocol
   private var authorizationContinuation: CheckedContinuation<Void, Never>?
-  private var locationContinuation: CheckedContinuation<CLLocationCoordinate2D?, Never>?
+  private var locationContinuation: CheckedContinuation<LocationResult, Never>?
 
-  override init() {
+  init(manager: any CLLocationManagerProtocol = CLLocationManager()) {
+    self.manager = manager
     super.init()
-    manager.delegate = self
+    self.manager.delegate = self
   }
 
-  /// Resolves to nil if permission is denied/restricted or the location fetch
-  /// fails; otherwise the device's current coordinate.
-  func requestOneShotLocation() async -> CLLocationCoordinate2D? {
+  func requestOneShotLocation() async -> LocationResult {
     if manager.authorizationStatus == .notDetermined {
       await withCheckedContinuation { continuation in
         self.authorizationContinuation = continuation
@@ -38,7 +62,7 @@ final class LocationService: NSObject, CLLocationManagerDelegate, LocationProvid
     guard manager.authorizationStatus == .authorizedWhenInUse
       || manager.authorizationStatus == .authorizedAlways
     else {
-      return nil
+      return .denied
     }
 
     return await withCheckedContinuation { continuation in
@@ -56,14 +80,18 @@ final class LocationService: NSObject, CLLocationManagerDelegate, LocationProvid
 
   nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     Task { @MainActor in
-      self.locationContinuation?.resume(returning: locations.first?.coordinate)
+      if let coordinate = locations.first?.coordinate {
+        self.locationContinuation?.resume(returning: .success(coordinate))
+      } else {
+        self.locationContinuation?.resume(returning: .unavailable)
+      }
       self.locationContinuation = nil
     }
   }
 
   nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     Task { @MainActor in
-      self.locationContinuation?.resume(returning: nil)
+      self.locationContinuation?.resume(returning: .unavailable)
       self.locationContinuation = nil
     }
   }

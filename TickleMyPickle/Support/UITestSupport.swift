@@ -71,8 +71,8 @@ extension PickleballMapViewModel {
   /// Fixed coordinate for the "Near me" path, so geolocate never prompts.
   @MainActor
   struct UITestLocationStub: LocationProviding {
-    func requestOneShotLocation() async -> CLLocationCoordinate2D? {
-      CLLocationCoordinate2D(latitude: 47.6685, longitude: -122.3860)
+    func requestOneShotLocation() async -> LocationResult {
+      .success(CLLocationCoordinate2D(latitude: 47.6685, longitude: -122.3860))
     }
   }
 #endif

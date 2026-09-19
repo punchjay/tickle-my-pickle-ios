@@ -29,6 +29,10 @@ final class AmenitiesTests: XCTestCase {
     XCTAssertTrue(kinds(court("Lighted Courts at 5th")).contains(.lighted))
   }
 
+  func testReturnsNoTagsForAGenericallyNamedCourt() {
+    XCTAssertTrue(Amenities.inferAmenities(for: court("Main Street Courts")).isEmpty)
+  }
+
   func testDropsBothIndoorAndOutdoorOnAnEqualConfidenceTie() {
     // "club" -> indoor low, "tennis center" -> outdoor low: tie, so neither.
     let k = kinds(court("Tennis Center Club"))

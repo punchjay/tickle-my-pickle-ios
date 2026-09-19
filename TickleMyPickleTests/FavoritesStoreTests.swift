@@ -44,6 +44,18 @@ final class FavoritesStoreTests: XCTestCase {
     XCTAssertFalse(store.isFavorite("1"))
   }
 
+  func testTogglingOneOfMultipleFavoritesRemovesOnlyThatOne() {
+    let store = FavoritesStore()
+    store.toggleFavorite(court("1"))
+    store.toggleFavorite(court("2"))
+    store.toggleFavorite(court("3"))
+
+    store.toggleFavorite(court("2"))
+
+    XCTAssertEqual(store.favorites.map(\.id), ["1", "3"])
+    XCTAssertFalse(store.isFavorite("2"))
+  }
+
   func testFavoritesPersistToAFreshInstance() {
     let store = FavoritesStore()
     store.toggleFavorite(court("1"))

@@ -112,4 +112,40 @@ final class GooglePlacesClientTests: XCTestCase {
       XCTFail("wrong error type: \(error)")
     }
   }
+
+  func testSearchCourtsFallsBackToHTTPStatusWhenNoErrorEnvelope() async {
+    // A non-2xx with a body that isn't the {error: {status, message}} shape
+    // (e.g. an upstream proxy's plain error page) must still surface *a*
+    // diagnosable reason instead of failing to decode.
+    URLProtocolStub.statusCode = 500
+    URLProtocolStub.responseData = Data("Internal Server Error".utf8)
+
+    do {
+      _ = try await GooglePlacesClient.searchCourts(near: LatLng(lat: 0, lng: 0), session: session)
+      XCTFail("expected searchCourts to throw")
+    } catch let error as GooglePlacesError {
+      guard case .places(let message) = error else {
+        return XCTFail("wrong error case: \(error)")
+      }
+      XCTAssertEqual(message, "HTTP 500")
+    } catch {
+      XCTFail("wrong error type: \(error)")
+    }
+  }
+
+  func testSearchCourtsFallsBackForMissingDisplayNameAndLocation() async throws {
+    URLProtocolStub.statusCode = 200
+    URLProtocolStub.responseData = Data("""
+    {"places":[{"id":"noname"}]}
+    """.utf8)
+
+    let origin = LatLng(lat: 5, lng: 6)
+    let courts = try await GooglePlacesClient.searchCourts(near: origin, session: session)
+
+    XCTAssertEqual(courts.count, 1)
+    XCTAssertEqual(courts[0].name, AppCopy.unknownCourt)
+    XCTAssertEqual(courts[0].address, "")
+    XCTAssertEqual(courts[0].location, origin)
+    XCTAssertNil(courts[0].isOpen)
+  }
 }
