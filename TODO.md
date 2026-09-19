@@ -24,6 +24,36 @@ way or the other:
 
 After ~27 Nov 2026 `gc` collects the object and the choice is made for you.
 
+## Map water doesn't match the web app's color
+
+The web app's retro map theme (`../tickle-my-pickle/docs/map-style.json`) colors
+water `#2E5A86` via Google's Cloud-based JSON map styling. `CourtMapView.swift`
+uses Apple MapKit instead (a deliberate choice — no map API key needed on iOS),
+and MapKit's SwiftUI `Map` has no public API for recoloring individual features:
+`.mapStyle(.standard(elevation:emphasis:pointsOfInterest:showsTraffic:))` only
+exposes elevation, `.muted`/`.standard` emphasis, POI categories, and traffic —
+nothing per-feature like water vs. land vs. roads. Confirmed against current
+Apple docs (`MapStyle`, `MapStyle.standard(elevation:emphasis:pointsOfInterest:showsTraffic:)`)
+as of 2026-09-18; this isn't a version gap, it's a real API gap.
+
+Options, roughly in order of effort:
+
+- **Approximate with `.standard(emphasis: .muted)`** — quick, no new
+  dependencies, but desaturates the whole map together rather than targeting
+  water specifically; won't hit `#2E5A86`.
+- **Overlay real water geometry** — render a semi-transparent `#2E5A86`
+  `MKPolygon`/overlay only over actual water bodies, sourced from bundled
+  coastline/lake data (e.g. Natural Earth). Matches the visual intent without a
+  new map SDK, but is real engineering: sourcing + bundling geo data, and won't
+  be pixel-perfect at all zoom levels.
+- **Switch to the Google Maps SDK for iOS** — reuse the exact same Cloud-styled
+  Map ID and `map-style.json` as the React app for a true match. Requires
+  adding the Google Maps iOS SDK dependency and an API key, which this app has
+  so far deliberately avoided needing.
+
+No decision made yet; revisit when visual parity with the web app becomes a
+priority.
+
 ## No linter configured
 
 There is no SwiftLint config in this repo and `swiftlint` is not installed, so
