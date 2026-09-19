@@ -34,9 +34,9 @@ final class FakePlacesProvider: PlacesProviding, @unchecked Sendable {
 
 @MainActor
 final class FakeLocationProvider: LocationProviding {
-  var coordinate: CLLocationCoordinate2D?
-  init(coordinate: CLLocationCoordinate2D?) { self.coordinate = coordinate }
-  func requestOneShotLocation() async -> CLLocationCoordinate2D? { coordinate }
+  var result: LocationResult
+  init(result: LocationResult) { self.result = result }
+  func requestOneShotLocation() async -> LocationResult { result }
 }
 
 struct StubError: LocalizedError {
@@ -54,12 +54,12 @@ final class PickleballMapViewModelTests: XCTestCase {
 
   private func makeViewModel(
     places: FakePlacesProvider = FakePlacesProvider(),
-    location: CLLocationCoordinate2D? = nil,
+    location: LocationResult = .denied,
     hasApiKey: Bool = true,
   ) -> PickleballMapViewModel {
     PickleballMapViewModel(
       places: places,
-      locationProvider: FakeLocationProvider(coordinate: location),
+      locationProvider: FakeLocationProvider(result: location),
       hasApiKey: hasApiKey,
     )
   }
@@ -147,7 +147,10 @@ final class PickleballMapViewModelTests: XCTestCase {
 
   func testGeolocateSuccessSearchesAroundTheDeviceLocation() async {
     let places = FakePlacesProvider(searchResult: .success([court("1")]))
-    let vm = makeViewModel(places: places, location: CLLocationCoordinate2D(latitude: 47.6, longitude: -122.3))
+    let vm = makeViewModel(
+      places: places,
+      location: .success(CLLocationCoordinate2D(latitude: 47.6, longitude: -122.3)),
+    )
 
     await vm.handleGeolocate()
 
@@ -159,11 +162,25 @@ final class PickleballMapViewModelTests: XCTestCase {
 
   func testGeolocateDeniedSurfacesErrorWithoutSearching() async {
     let places = FakePlacesProvider(searchResult: .success([court("1")]))
-    let vm = makeViewModel(places: places, location: nil)
+    let vm = makeViewModel(places: places, location: .denied)
 
     await vm.handleGeolocate()
 
     XCTAssertEqual(vm.error, AppCopy.Errors.geolocationDenied)
+    XCTAssertTrue(vm.courts.isEmpty)
+    XCTAssertFalse(vm.loading)
+    XCTAssertTrue(places.searchLocations.isEmpty)
+  }
+
+  func testGeolocateUnavailableSurfacesTryAgainMessageWithoutSearching() async {
+    // Permission granted but no fix obtained (GPS timeout, no simulated
+    // location set, etc.) must not be reported as a permissions problem.
+    let places = FakePlacesProvider(searchResult: .success([court("1")]))
+    let vm = makeViewModel(places: places, location: .unavailable)
+
+    await vm.handleGeolocate()
+
+    XCTAssertEqual(vm.error, AppCopy.Errors.geolocationUnavailable)
     XCTAssertTrue(vm.courts.isEmpty)
     XCTAssertFalse(vm.loading)
     XCTAssertTrue(places.searchLocations.isEmpty)

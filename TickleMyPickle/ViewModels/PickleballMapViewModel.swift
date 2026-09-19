@@ -102,12 +102,16 @@ final class PickleballMapViewModel {
     guard hasApiKey else { return }
     loading = true
     error = nil
-    guard let coordinate = await locationProvider.requestOneShotLocation() else {
+    switch await locationProvider.requestOneShotLocation() {
+    case .success(let coordinate):
+      await searchNearby(LatLng(lat: coordinate.latitude, lng: coordinate.longitude))
+    case .denied:
       loading = false
       error = AppCopy.Errors.geolocationDenied
-      return
+    case .unavailable:
+      loading = false
+      error = AppCopy.Errors.geolocationUnavailable
     }
-    await searchNearby(LatLng(lat: coordinate.latitude, lng: coordinate.longitude))
   }
 
   func handleCourtSelect(_ court: Court) {
