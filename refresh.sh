@@ -78,11 +78,21 @@ if [[ "${PHONE:-0}" != "1" ]]; then
   echo "==> Installing..."
   xcrun simctl install booted "$APP_PATH"
 
+  # A fresh/erased sim has no GPS and no location permission, so the app's
+  # CLLocationManager fails with "couldn't get your location" every time.
+  # Grant it and seed a fixed location (Crested Butte, CO -- matches the
+  # sample court data) so the simulator behaves like a real device would.
+  echo "==> Granting location permission + seeding a GPS fix..."
+  xcrun simctl privacy booted grant location "$BUNDLE_ID"
+  xcrun simctl location booted set 38.8697,-106.9878
+
   echo "==> Relaunching (terminate + launch)..."
   xcrun simctl terminate booted "$BUNDLE_ID" 2>/dev/null || true
   xcrun simctl launch booted "$BUNDLE_ID"
 
-  open -a Simulator
+  # Xcode 26+ folded the standalone Simulator.app into DeviceHub -- "open -a
+  # Simulator" no longer resolves, so target it by bundle ID instead.
+  open -b com.apple.dt.Devices
   echo "==> Done."
   exit 0
 fi
