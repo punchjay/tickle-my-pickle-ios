@@ -3,6 +3,7 @@ Secrets.xcconfig
 
 # Personal working notes for Claude Code (kept local only)
 CLAUDE.md
+TODO.md
 
 # Xcode / generated project
 *.xcodeproj/
