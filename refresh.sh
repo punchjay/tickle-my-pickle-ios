@@ -130,6 +130,10 @@ matches = []
 for d in devices:
     props = d.get("deviceProperties", {})
     hw = d.get("hardwareProperties", {})
+    # devicectl also lists booted simulators; only a real iPhone can take a
+    # signed device build.
+    if hw.get("reality") != "physical":
+        continue
     name = props.get("name", "?")
     # devicectl addresses the device by CoreDevice UUID, while the xcodebuild
     # -destination flag wants the hardware UDID. They are different strings.
