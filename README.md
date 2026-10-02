@@ -15,7 +15,7 @@ ranked list of nearby courts with ratings, hours, amenities, and directions.
 - 🗺️ **Map + list** — numbered pins on an Apple MapKit map, synced to a results list
 - ⭐ **Ratings & hours** — Google rating, review count, and live open/closed status
 - 🏷️ **Amenity badges** — indoor / outdoor / lighted / free, inferred from the listing
-- 🧭 **Directions** — hand off to Maps for turn-by-turn
+- 🧭 **Directions** — open Google Maps for turn-by-turn
 - 💾 **Favorites** — saved on-device, persist across launches
 
 ## How it works
