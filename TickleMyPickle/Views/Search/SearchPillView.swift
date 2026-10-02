@@ -28,7 +28,13 @@ struct SearchPillView: View {
         .disabled(blocked)
         .accessibilityLabel(AppCopy.Search.submitLabel)
 
-        TextField(AppCopy.Search.placeholder, text: $query)
+        // Explicit prompt color: the default placeholder color adapts to dark
+        // mode (light gray), but the pill is always white, so it vanished.
+        TextField(
+          AppCopy.Search.placeholder,
+          text: $query,
+          prompt: Text(AppCopy.Search.placeholder).foregroundStyle(Semantic.textMuted)
+        )
           .font(AppFont.body(16))
           .foregroundStyle(Semantic.text)
           .disabled(blocked)
