@@ -84,7 +84,7 @@ struct CourtListView: View {
         .clipShape(RoundedRectangle(cornerRadius: Radii.sm))
         // `.plain` + an explicit foregroundStyle suppresses SwiftUI's automatic
         // dimming, so the disabled look has to be spelled out.
-        .opacity(disabled ? 0.4 : 1)
+        .opacity(disabled ? 0.4 : 0.8)
     }
     .buttonStyle(.plain)
     .disabled(disabled)
