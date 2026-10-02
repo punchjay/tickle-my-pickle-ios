@@ -10,6 +10,8 @@ import XCTest
 final class FakeCLLocationManager: CLLocationManagerProtocol {
   weak var delegate: CLLocationManagerDelegate?
   var authorizationStatus: CLAuthorizationStatus
+  var desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyBest
+  var location: CLLocation?
   private(set) var requestedAuthorization = false
   private(set) var requestedLocation = false
 
@@ -131,5 +133,46 @@ final class LocationServiceTests: XCTestCase {
 
     guard case .denied = await task.value else { return XCTFail("expected .denied") }
     XCTAssertFalse(manager.requestedLocation)
+  }
+
+  func testUsesCoarseAccuracySoTheFixArrivesQuickly() {
+    // requestLocation() blocks until desiredAccuracy is met; the default
+    // (Best) means waiting on a full GPS lock.
+    let manager = FakeCLLocationManager(authorizationStatus: .authorizedWhenInUse)
+    _ = LocationService(manager: manager)
+
+    XCTAssertEqual(manager.desiredAccuracy, kCLLocationAccuracyKilometer)
+  }
+
+  func testRecentCachedLocationIsReturnedWithoutRequestingAFix() async {
+    let manager = FakeCLLocationManager(authorizationStatus: .authorizedWhenInUse)
+    manager.location = CLLocation(latitude: 47.6, longitude: -122.3)
+    let service = LocationService(manager: manager)
+
+    guard case .success(let coordinate) = await service.requestOneShotLocation() else {
+      return XCTFail("expected .success")
+    }
+    XCTAssertEqual(coordinate.latitude, 47.6)
+    XCTAssertFalse(manager.requestedLocation)
+  }
+
+  func testStaleCachedLocationIsIgnoredAndAFreshFixIsRequested() async {
+    let manager = FakeCLLocationManager(authorizationStatus: .authorizedWhenInUse)
+    manager.location = CLLocation(
+      coordinate: CLLocationCoordinate2D(latitude: 1, longitude: 2),
+      altitude: 0, horizontalAccuracy: 100, verticalAccuracy: -1,
+      timestamp: Date(timeIntervalSinceNow: -(LocationService.maxCachedLocationAge + 60)),
+    )
+    let service = LocationService(manager: manager)
+
+    let task = Task { await service.requestOneShotLocation() }
+    await waitUntil(manager.requestedLocation)
+
+    service.locationManager(CLLocationManager(), didUpdateLocations: [CLLocation(latitude: 10, longitude: 20)])
+
+    guard case .success(let coordinate) = await task.value else {
+      return XCTFail("expected .success")
+    }
+    XCTAssertEqual(coordinate.latitude, 10)
   }
 }

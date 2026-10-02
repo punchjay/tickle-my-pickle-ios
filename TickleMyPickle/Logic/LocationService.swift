@@ -26,6 +26,8 @@ protocol LocationProviding {
 protocol CLLocationManagerProtocol: AnyObject {
   var delegate: CLLocationManagerDelegate? { get set }
   var authorizationStatus: CLAuthorizationStatus { get }
+  var desiredAccuracy: CLLocationAccuracy { get set }
+  var location: CLLocation? { get }
   func requestWhenInUseAuthorization()
   func requestLocation()
 }
@@ -41,6 +43,9 @@ extension CLLocationManager: CLLocationManagerProtocol {}
 /// <device> set <lat>,<lon>` is built to drive for scripted verification.
 @MainActor
 final class LocationService: NSObject, CLLocationManagerDelegate, LocationProviding {
+  /// A cached fix younger than this is reused instead of asking for a new one.
+  static let maxCachedLocationAge: TimeInterval = 5 * 60
+
   private let manager: any CLLocationManagerProtocol
   private var authorizationContinuation: CheckedContinuation<Void, Never>?
   private var locationContinuation: CheckedContinuation<LocationResult, Never>?
@@ -49,6 +54,12 @@ final class LocationService: NSObject, CLLocationManagerDelegate, LocationProvid
     self.manager = manager
     super.init()
     self.manager.delegate = self
+    // requestLocation() doesn't return until it reaches desiredAccuracy (or
+    // gives up after ~10s), and the default is kCLLocationAccuracyBest -- i.e.
+    // waiting on a full GPS lock, which made "Near me" take several seconds on
+    // device. The search radius is ~10 miles, so a Wi-Fi/cell-grade fix is
+    // plenty and usually arrives in well under a second.
+    self.manager.desiredAccuracy = kCLLocationAccuracyKilometer
   }
 
   func requestOneShotLocation() async -> LocationResult {
@@ -63,6 +74,14 @@ final class LocationService: NSObject, CLLocationManagerDelegate, LocationProvid
       || manager.authorizationStatus == .authorizedAlways
     else {
       return .denied
+    }
+
+    // A recent fix (e.g. from an earlier tap) is good enough to search around;
+    // skip the hardware round trip entirely.
+    if let cached = manager.location,
+      -cached.timestamp.timeIntervalSinceNow < Self.maxCachedLocationAge
+    {
+      return .success(cached.coordinate)
     }
 
     return await withCheckedContinuation { continuation in
@@ -80,7 +99,8 @@ final class LocationService: NSObject, CLLocationManagerDelegate, LocationProvid
 
   nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     Task { @MainActor in
-      if let coordinate = locations.first?.coordinate {
+      // Delivered oldest-first; the last element is the most recent fix.
+      if let coordinate = locations.last?.coordinate {
         self.locationContinuation?.resume(returning: .success(coordinate))
       } else {
         self.locationContinuation?.resume(returning: .unavailable)
