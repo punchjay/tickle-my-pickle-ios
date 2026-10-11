@@ -24,4 +24,7 @@ struct Court: Identifiable, Codable, Hashable, Sendable {
   /// the amenity heuristic (`inferAmenities`); never displayed directly.
   var types: [String]?
   var location: LatLng
+  /// Filled in after the search returns, from the amenities backend. Nil
+  /// until then, or when the reviews had nothing to say.
+  var reviewAmenities: ReviewAmenities?
 }

@@ -15,4 +15,16 @@ enum Config {
   /// the friendly missing-key error instead of failing every Places call.
   static let hasApiKey: Bool =
     !googleMapsRestAPIKey.isEmpty && googleMapsRestAPIKey != "YOUR_KEY_HERE"
+
+  /// Amenities backend (the Worker in `backend/`), read from Info.plist via
+  /// `$(AMENITIES_API_HOST)`. A bare host rather than a URL because
+  /// xcconfig treats `//` as a comment, which would cut `https://` short.
+  /// Unset means the review-amenities feature is off.
+  static let amenitiesAPIURL: URL? = {
+    guard
+      let host = Bundle.main.object(forInfoDictionaryKey: "AmenitiesAPIHost") as? String,
+      !host.isEmpty
+    else { return nil }
+    return URL(string: "https://\(host)/amenities")
+  }()
 }

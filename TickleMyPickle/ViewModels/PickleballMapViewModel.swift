@@ -31,6 +31,7 @@ final class PickleballMapViewModel {
   let hasApiKey: Bool
 
   private let places: any PlacesProviding
+  private let amenitiesProvider: any AmenitiesProviding
   private let locationProvider: any LocationProviding
 
   /// Dependencies default to the live implementations, so production callers
@@ -38,10 +39,12 @@ final class PickleballMapViewModel {
   /// forced `hasApiKey` so the search flow isn't gated by the build's key.
   init(
     places: any PlacesProviding = GooglePlacesService(),
+    amenities: any AmenitiesProviding = ReviewAmenitiesService(),
     locationProvider: any LocationProviding = LocationService(),
     hasApiKey: Bool = Config.hasApiKey,
   ) {
     self.places = places
+    self.amenitiesProvider = amenities
     self.locationProvider = locationProvider
     self.hasApiKey = hasApiKey
     self.error = hasApiKey ? nil : AppCopy.Errors.missingApiKey
@@ -63,6 +66,9 @@ final class PickleballMapViewModel {
       zoom = 12
       courts = results
       searchSeq += 1
+      // Results are on screen; review amenities refine the badges after.
+      loading = false
+      await loadReviewAmenities(forSearch: searchSeq)
     } catch {
       print("Places searchText failed: \(error)")
       courts = []
@@ -73,6 +79,23 @@ final class PickleballMapViewModel {
       #else
         self.error = AppCopy.Errors.searchFailed
       #endif
+    }
+  }
+
+  /// Fetch review-based amenities for the current results and fold them in.
+  /// Best-effort: on failure the courts keep their name-based tags. Dropped
+  /// if a newer search replaced the results while the request was out.
+  private func loadReviewAmenities(forSearch seq: Int) async {
+    do {
+      let found = try await amenitiesProvider.amenities(for: courts.map(\.id))
+      guard seq == searchSeq, !found.isEmpty else { return }
+      courts = courts.map { court in
+        var court = court
+        court.reviewAmenities = found[court.id] ?? court.reviewAmenities
+        return court
+      }
+    } catch {
+      print("Review amenities failed: \(error)")
     }
   }
 
