@@ -5,10 +5,13 @@ import SwiftUI
 struct SearchPillView: View {
   let loading: Bool
   let disabled: Bool
+  /// Focus the field once the view is on screen, bringing the keyboard up.
+  var autoFocus = false
   let onSearch: (String) -> Void
   let onGeolocate: () -> Void
 
   @State private var query = ""
+  @FocusState private var focused: Bool
 
   private var blocked: Bool { disabled || loading }
 
@@ -39,6 +42,7 @@ struct SearchPillView: View {
           .font(AppFont.body(16))
           .foregroundStyle(Semantic.text)
           .disabled(blocked)
+          .focused($focused)
           .submitLabel(.search)
           .onSubmit(submit)
           .accessibilityLabel(AppCopy.Search.inputLabel)
@@ -58,6 +62,9 @@ struct SearchPillView: View {
           Image(systemName: "location.fill")
           Text(AppCopy.Search.nearMe)
             .font(AppFont.bodyMedium(14))
+            // While the field has focus it claims more width; don't let it
+            // squeeze this label.
+            .fixedSize()
         }
         .foregroundStyle(Semantic.link)
         // Padding inside the label so it counts toward the 44pt tap target.
@@ -76,6 +83,13 @@ struct SearchPillView: View {
     .clipShape(Capsule())
     .overlay(Capsule().stroke(Semantic.borderSoft, lineWidth: 1))
     .cardShadow()
+    .task {
+      guard autoFocus else { return }
+      // Focusing during the first layout pass is ignored; a short beat lets
+      // the screen settle so the keyboard visibly slides in.
+      try? await Task.sleep(for: .milliseconds(350))
+      focused = true
+    }
   }
 
   private func submit() {
