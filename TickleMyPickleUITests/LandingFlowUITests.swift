@@ -33,10 +33,10 @@ final class LandingFlowUITests: XCTestCase {
     searchField.typeText("Seattle\n")
 
     XCTAssertTrue(
-      app.staticTexts["Ballard Community Court"].waitForExistence(timeout: 5),
+      app.buttons["Ballard Community Court"].waitForExistence(timeout: 5),
       "Results list should show the first stubbed court")
     XCTAssertTrue(
-      app.staticTexts["Green Lake Pickleball"].exists,
+      app.buttons["Green Lake Pickleball"].exists,
       "Results list should show the second stubbed court")
   }
 
@@ -64,7 +64,7 @@ final class LandingFlowUITests: XCTestCase {
     app.buttons["Remove from saved"].firstMatch.tap()
     XCTAssertFalse(savedTab.isEnabled, "Removing the last save should disable the Saved tab again")
     XCTAssertTrue(
-      app.staticTexts["Green Lake Pickleball"].waitForExistence(timeout: 5),
+      app.buttons["Green Lake Pickleball"].waitForExistence(timeout: 5),
       "Should fall back to the Nearby list, which shows every stubbed court")
   }
 
@@ -77,7 +77,7 @@ final class LandingFlowUITests: XCTestCase {
     nearMe.tap()
 
     XCTAssertTrue(
-      app.staticTexts["Ballard Community Court"].waitForExistence(timeout: 5),
+      app.buttons["Ballard Community Court"].waitForExistence(timeout: 5),
       "Near me should populate the results list")
   }
 }

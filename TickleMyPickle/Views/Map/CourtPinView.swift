@@ -5,7 +5,11 @@ struct CourtPinView: View {
   let number: Int
   let selected: Bool
 
-  private var size: CGFloat { selected ? 34 : 28 }
+  // The number uses the footnote text style (13pt by default), and the circle
+  // scales with it so larger numbers still fit.
+  @ScaledMetric(relativeTo: .footnote) private var baseSize: CGFloat = 28
+
+  private var size: CGFloat { selected ? baseSize + 6 : baseSize }
 
   var body: some View {
     ZStack {
@@ -15,7 +19,7 @@ struct CourtPinView: View {
           Circle().stroke(selected ? Palette.midnight : Palette.terracottaDark, lineWidth: 2),
         )
       Text("\(number)")
-        .font(.system(size: 13, weight: .bold))
+        .font(.footnote.bold())
         .foregroundStyle(.white)
     }
     .frame(width: size, height: size)

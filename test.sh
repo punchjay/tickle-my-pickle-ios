@@ -22,5 +22,16 @@ xcrun simctl bootstatus "$SIM" -b >/dev/null
 echo "==> Opening DeviceHub so the simulator UI is visible..."
 open -b com.apple.dt.Devices
 
+# The test run reinstalls the app, which drops its location permission, and
+# the sim has no GPS fix -- so "Near me" fails with "couldn't get your
+# location" afterwards. Restore both on the way out, pass or fail (same setup
+# as refresh.sh).
+restore_location() {
+  echo "==> Restoring location permission + GPS fix..."
+  xcrun simctl privacy "$SIM" grant location com.punchjay.ticklemypickle || true
+  xcrun simctl location "$SIM" set 38.8697,-106.9878 || true
+}
+trap restore_location EXIT
+
 xcodebuild -project "$SCHEME.xcodeproj" -scheme "$SCHEME" \
   -destination "platform=iOS Simulator,name=$SIM,OS=latest" test

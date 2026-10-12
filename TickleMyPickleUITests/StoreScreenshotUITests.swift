@@ -36,14 +36,14 @@ final class StoreScreenshotUITests: XCTestCase {
     searchField.tap()
     searchField.typeText("Seattle\n")
     XCTAssertTrue(
-      app.staticTexts["Ballard Community Court"].waitForExistence(timeout: 5),
+      app.buttons["Ballard Community Court"].waitForExistence(timeout: 5),
       "Results list should render the stubbed courts")
     // Map tiles stream in asynchronously and the camera animates to frame the
     // pins; give both time to settle so the capture isn't half-loaded.
     Thread.sleep(forTimeInterval: 4)
     attachScreenshot(named: "02-results")
 
-    app.staticTexts["Salmon Bay Indoor Rec Center"].tap()
+    app.buttons["Salmon Bay Indoor Rec Center"].tap()
     Thread.sleep(forTimeInterval: 2) // selection recenters the map
     attachScreenshot(named: "03-selected")
 
@@ -55,7 +55,7 @@ final class StoreScreenshotUITests: XCTestCase {
     XCTAssertTrue(savedTab.waitForExistence(timeout: 5), "Saved tab should be present")
     savedTab.tap()
     XCTAssertTrue(
-      app.staticTexts["Ballard Community Court"].waitForExistence(timeout: 5),
+      app.buttons["Ballard Community Court"].waitForExistence(timeout: 5),
       "Saved tab should list the saved court")
     attachScreenshot(named: "04-saved")
   }

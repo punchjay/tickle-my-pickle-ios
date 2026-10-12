@@ -88,6 +88,7 @@ struct CourtListView: View {
     }
     .buttonStyle(.plain)
     .disabled(disabled)
+    .accessibilityAddTraits(tab == target ? .isSelected : [])
     // VoiceOver otherwise announces the dimmed tab with no reason for it.
     .accessibilityHint(disabled ? AppCopy.CourtList.emptySaved : "")
   }
