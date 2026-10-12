@@ -39,6 +39,10 @@ targets:
       path: TickleMyPickle/Info.plist
       properties:
         CFBundleDisplayName: Tickle My Pickle
+        # Without these, XcodeGen writes literal "1.0" / "1" into Info.plist,
+        # which shadows the build settings above.
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         UILaunchScreen: {}
         # App uses only standard HTTPS/TLS (exempt encryption), so declare it up
         # front — otherwise every TestFlight/App Store build stalls in "Missing
