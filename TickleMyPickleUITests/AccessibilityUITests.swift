@@ -106,7 +106,11 @@ final class AccessibilityUITests: XCTestCase {
       app.buttons["Search"],
       app.buttons["Near me"],
       app.buttons["Save court"].firstMatch,
-      app.links["Directions"].firstMatch,
+      // iOS 27 exposes the SwiftUI Link as a link, but iOS 26 (the CI
+      // runner) doesn't, so match by name whatever its element type. The
+      // control comes before its text in the tree, so firstMatch is the
+      // tappable one.
+      app.descendants(matching: .any)["Directions"].firstMatch,
     ] {
       assertTarget(element)
     }
