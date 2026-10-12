@@ -8,7 +8,8 @@
 #   UPLOAD=1 ./appstore/ship.sh    # same, but upload to App Store Connect
 #
 # Prereqs:
-#   - DEVELOPMENT_TEAM uncommented in Secrets.xcconfig (post-enrollment)
+#   - DEVELOPMENT_TEAM in Secrets.xcconfig set to the Denova LLC team (post-
+#     enrollment) -- a free Personal Team is rejected up front
 #   - Signed into Xcode with the Denova LLC Apple ID (Settings > Accounts),
 #     so -allowProvisioningUpdates can mint certs/profiles on first run
 #   - A real GOOGLE_MAPS_REST_API_KEY in Secrets.xcconfig -- without it the
@@ -41,6 +42,27 @@ if [[ -z "$TEAM_ID" || "$TEAM_ID" == X* ]]; then
   echo "Once the Apple Developer enrollment clears, grab the 10-char Team ID" >&2
   echo "from developer.apple.com/account and uncomment the line. Until then" >&2
   echo "there is nothing to sign with -- this script can't run." >&2
+  exit 1
+fi
+
+# refresh.sh is happy with a free Personal Team for on-device builds, but App
+# Store distribution needs the paid Denova LLC team. Xcode records which of its
+# signed-in teams are free, so check that instead of letting the archive run
+# and fail late with a confusing provisioning error.
+IS_FREE_TEAM=$(defaults export com.apple.dt.Xcode - 2>/dev/null | TEAM_ID="$TEAM_ID" python3 -c '
+import os, plistlib, sys
+try:
+    accounts = plistlib.loads(sys.stdin.buffer.read()).get("IDEProvisioningTeamByIdentifier", {})
+except Exception:
+    accounts = {}
+teams = [t for ts in accounts.values() for t in ts if t.get("teamID") == os.environ["TEAM_ID"]]
+print("1" if any(t.get("isFreeProvisioningTeam") for t in teams) else "0")
+' 2>/dev/null || echo 0)
+if [[ "$IS_FREE_TEAM" == "1" ]]; then
+  echo "error: DEVELOPMENT_TEAM $TEAM_ID is a free Personal Team -- it can sign" >&2
+  echo "on-device dev builds (refresh.sh) but can't ship to the App Store." >&2
+  echo "Replace it in Secrets.xcconfig with the Denova LLC Team ID from" >&2
+  echo "developer.apple.com/account > Membership Details." >&2
   exit 1
 fi
 
