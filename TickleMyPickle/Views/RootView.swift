@@ -37,15 +37,21 @@ struct RootView: View {
         StripedBackdropView()
           .ignoresSafeArea()
 
-        // Header card + search: width min(400, screen - 32), stacked with an
-        // 8pt gap, with the block's midpoint at 40% of the height — matching
-        // the web app's hero placement (Ms: top 40%, translate -50%).
-        VStack(spacing: 8) {
+        // The search field takes focus on launch, so the keyboard slides up
+        // and the pill rides just above it; the header card stays centered
+        // in the space left over. Width min(400, screen - 32).
+        VStack(spacing: 0) {
+          Spacer(minLength: 8)
           HeaderCardView()
-          searchColumn
+            // Keep the card at its natural height; between two Spacers it can
+            // be squeezed a hair, which clips the wordmark's glyphs.
+            .fixedSize(horizontal: false, vertical: true)
+          Spacer(minLength: 8)
+          searchColumn(autoFocus: true)
+            .padding(.bottom, 12)
         }
         .frame(width: min(400, geo.size.width - 32))
-        .position(x: geo.size.width / 2, y: geo.size.height * 0.4)
+        .frame(maxWidth: .infinity)
       }
     }
   }
@@ -61,7 +67,7 @@ struct RootView: View {
             zoom: viewModel.zoom,
             onSelectCourt: viewModel.handleCourtSelect,
           )
-          searchColumn
+          searchColumn()
             .frame(maxWidth: 420)
             .padding(.horizontal, 12)
             // Sits 5pt lower than it used to, clearing the status-bar scrim.
@@ -84,11 +90,12 @@ struct RootView: View {
     }
   }
 
-  private var searchColumn: some View {
+  private func searchColumn(autoFocus: Bool = false) -> some View {
     VStack(spacing: 8) {
       SearchPillView(
         loading: viewModel.loading,
         disabled: !viewModel.hasApiKey,
+        autoFocus: autoFocus,
         onSearch: { query in Task { await viewModel.handleSearch(query: query) } },
         onGeolocate: { Task { await viewModel.handleGeolocate() } },
       )

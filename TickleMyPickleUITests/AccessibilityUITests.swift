@@ -38,6 +38,11 @@ final class AccessibilityUITests: XCTestCase {
 
   func testLandingScreenPassesAccessibilityAudit() throws {
     let app = launchStubbedApp()
+    // The field takes focus on launch; audit the screen as people see it,
+    // after the keyboard has finished sliding in. (A simulator using the Mac's
+    // hardware keyboard never shows one, so don't fail on its absence.)
+    _ = app.keyboards.firstMatch.waitForExistence(timeout: 5)
+    Thread.sleep(forTimeInterval: 1)
     try app.performAccessibilityAudit { issue in self.isKnown(issue) }
   }
 
@@ -134,10 +139,15 @@ final class AccessibilityUITests: XCTestCase {
       let window = app.windows.firstMatch.frame
       // The status bar and Dynamic Island sit in roughly the top 54pt.
       let usable = window.inset(by: UIEdgeInsets(top: 54, left: 0, bottom: 0, right: 0))
+      // The landing screen opens with the keyboard up; its keys are the
+      // system's, not ours, and some of them overlap by design.
+      let keyboard = app.keyboards.firstMatch
+      let keyboardFrame = keyboard.exists ? keyboard.frame : .null
       let controls =
         (app.buttons.allElementsBoundByIndex + app.links.allElementsBoundByIndex
         + app.textFields.allElementsBoundByIndex)
         .filter { $0.exists && $0.isHittable && $0.label != "Legal" }
+        .filter { !keyboardFrame.contains($0.frame) }
         .map { (label: $0.label, frame: $0.frame) }
       XCTAssertFalse(controls.isEmpty, "\(screen): found no controls to check")
 

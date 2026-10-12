@@ -18,6 +18,49 @@ final class LandingFlowUITests: XCTestCase {
     return app
   }
 
+  /// On launch the search field takes focus: the keyboard comes up on its own
+  /// and the search pill sits just above it, with the header card above that.
+  func testKeyboardOpensOnLaunchWithSearchAboveIt() throws {
+    let app = launchStubbedApp()
+
+    let field = app.textFields["Search location"]
+    XCTAssertTrue(field.waitForExistence(timeout: 5), "Landing search field should be present")
+    let focused = expectation(
+      for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: field)
+    wait(for: [focused], timeout: 3)
+
+    // A simulator using the Mac's hardware keyboard (as CI's may) never shows
+    // the on-screen one, so placement can only be checked when it appears.
+    let keyboard = app.keyboards.firstMatch
+    guard keyboard.waitForExistence(timeout: 3) else {
+      throw XCTSkip("No on-screen keyboard (hardware keyboard connected); focus checked only")
+    }
+
+    // Wait out the keyboard's slide-in before measuring.
+    let settled = expectation(for: NSPredicate { _, _ in
+      field.frame.maxY <= keyboard.frame.minY
+    }, evaluatedWith: nil)
+    wait(for: [settled], timeout: 3)
+
+    let wordmark = app.staticTexts["Tickle My Pickle"]
+    XCTAssertTrue(wordmark.exists, "Header card should still show")
+    XCTAssertLessThan(wordmark.frame.maxY, field.frame.minY, "Header card should be above the search pill")
+
+    // Docked means the pill hugs the keyboard, not the card. Compared rather
+    // than measured against a fixed number: the keyboard element's frame
+    // starts below the predictive-text bar, whose height varies by device.
+    let gapBelow = keyboard.frame.minY - field.frame.maxY
+    let gapAbove = field.frame.minY - wordmark.frame.maxY
+    XCTAssertLessThan(
+      gapBelow, gapAbove,
+      "Search pill should sit just above the keyboard (\(Int(gapBelow))pt) rather than near the card (\(Int(gapAbove))pt)")
+
+    let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+    screenshot.name = "landing-keyboard"
+    screenshot.lifetime = .keepAlways
+    add(screenshot)
+  }
+
   /// Landing → type a location → the two stubbed courts appear in the list.
   func testTextSearchShowsResults() {
     let app = launchStubbedApp()
