@@ -11,6 +11,7 @@ extension PickleballMapViewModel {
       if ProcessInfo.processInfo.arguments.contains(uiTestStubArgument) {
         return PickleballMapViewModel(
           places: UITestPlacesStub(),
+          amenities: UITestAmenitiesStub(),
           locationProvider: UITestLocationStub(),
           hasApiKey: true,
         )
@@ -66,6 +67,12 @@ extension PickleballMapViewModel {
         ),
       ]
     }
+  }
+
+  /// No review amenities, so badges (and store screenshots) come only from
+  /// the deterministic name-based inference.
+  struct UITestAmenitiesStub: AmenitiesProviding {
+    func amenities(for placeIds: [String]) async throws -> [String: ReviewAmenities] { [:] }
   }
 
   /// Fixed coordinate for the "Near me" path, so geolocate never prompts.

@@ -46,6 +46,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSLocationWhenInUseUsageDescription: "We use your location to find pickleball courts near you."
         GoogleMapsRestAPIKey: "$(GOOGLE_MAPS_REST_API_KEY)"
+        AmenitiesAPIHost: "$(AMENITIES_API_HOST)"
         # Bundled fonts (see Resources/Fonts/). XcodeGen flattens the group into
         # the bundle root, so these are bare filenames. Support/Fonts.swift looks
         # them up by PostScript name and falls back to system fonts if absent.

@@ -39,4 +39,38 @@ final class AmenitiesTests: XCTestCase {
     XCTAssertFalse(k.contains(.indoor))
     XCTAssertFalse(k.contains(.outdoor))
   }
+
+  // MARK: Review answers
+
+  private func court(_ name: String, types: [String] = [], reviews: ReviewAmenities) -> Court {
+    var withReviews = court(name, types: types)
+    withReviews.reviewAmenities = reviews
+    return withReviews
+  }
+
+  func testReviewYesAddsAHighConfidenceTagTheNameMissed() {
+    let tags = Amenities.inferAmenities(
+      for: court("Main Street Courts", reviews: ReviewAmenities(indoor: true, lighted: true)),
+    )
+    XCTAssertTrue(tags.contains { $0.kind == .indoor && $0.confidence == .high })
+    XCTAssertTrue(tags.contains { $0.kind == .lighted && $0.confidence == .high })
+  }
+
+  func testReviewNoRemovesTheNameBasedGuess() {
+    // "Riverside Park" guesses outdoor + free; reviews say there's a fee.
+    let k = kinds(court("Riverside Park", types: ["park"], reviews: ReviewAmenities(free: false)))
+    XCTAssertFalse(k.contains(.free))
+    XCTAssertTrue(k.contains(.outdoor), "kinds the reviews don't mention keep the guess")
+  }
+
+  func testReviewsCanReportBothIndoorAndOutdoor() {
+    let k = kinds(court("Main Street Courts", reviews: ReviewAmenities(indoor: true, outdoor: true)))
+    XCTAssertTrue(k.contains(.indoor))
+    XCTAssertTrue(k.contains(.outdoor))
+  }
+
+  func testEmptyReviewAnswersLeaveTheGuessUnchanged() {
+    let k = kinds(court("Riverside Park", types: ["park"], reviews: ReviewAmenities()))
+    XCTAssertEqual(k, kinds(court("Riverside Park", types: ["park"])))
+  }
 }

@@ -32,6 +32,22 @@ final class FakePlacesProvider: PlacesProviding, @unchecked Sendable {
   }
 }
 
+/// Stub `AmenitiesProviding` with a canned answer; records the ids it was
+/// asked about. `@unchecked Sendable` for the same reason as above.
+final class FakeAmenitiesProvider: AmenitiesProviding, @unchecked Sendable {
+  var result: Result<[String: ReviewAmenities], Error>
+  private(set) var requestedIds: [[String]] = []
+
+  init(result: Result<[String: ReviewAmenities], Error> = .success([:])) {
+    self.result = result
+  }
+
+  func amenities(for placeIds: [String]) async throws -> [String: ReviewAmenities] {
+    requestedIds.append(placeIds)
+    return try result.get()
+  }
+}
+
 @MainActor
 final class FakeLocationProvider: LocationProviding {
   var result: LocationResult
@@ -54,11 +70,13 @@ final class PickleballMapViewModelTests: XCTestCase {
 
   private func makeViewModel(
     places: FakePlacesProvider = FakePlacesProvider(),
+    amenities: FakeAmenitiesProvider = FakeAmenitiesProvider(),
     location: LocationResult = .denied,
     hasApiKey: Bool = true,
   ) -> PickleballMapViewModel {
     PickleballMapViewModel(
       places: places,
+      amenities: amenities,
       locationProvider: FakeLocationProvider(result: location),
       hasApiKey: hasApiKey,
     )
@@ -207,5 +225,32 @@ final class PickleballMapViewModelTests: XCTestCase {
     await vm.handleSearch(query: "Fremont")
 
     XCTAssertEqual(vm.searchSeq, 2)
+  }
+
+  // MARK: Review amenities
+
+  func testSearchFoldsInReviewAmenitiesForTheResults() async {
+    let places = FakePlacesProvider(searchResult: .success([court("1"), court("2")]))
+    let amenities = FakeAmenitiesProvider(result: .success(["2": ReviewAmenities(lighted: true)]))
+    let vm = makeViewModel(places: places, amenities: amenities)
+
+    await vm.handleSearch(query: "Ballard")
+
+    XCTAssertEqual(amenities.requestedIds, [["1", "2"]])
+    XCTAssertNil(vm.courts[0].reviewAmenities)
+    XCTAssertEqual(vm.courts[1].reviewAmenities?.lighted, true)
+    XCTAssertFalse(vm.loading)
+  }
+
+  func testAmenitiesFailureKeepsResultsAndShowsNoError() async {
+    let places = FakePlacesProvider(searchResult: .success([court("1")]))
+    let amenities = FakeAmenitiesProvider(result: .failure(StubError(errorDescription: "boom")))
+    let vm = makeViewModel(places: places, amenities: amenities)
+
+    await vm.handleSearch(query: "Ballard")
+
+    XCTAssertEqual(vm.courts.map(\.id), ["1"])
+    XCTAssertNil(vm.courts[0].reviewAmenities)
+    XCTAssertNil(vm.error, "amenities are best-effort; a failure is not user-facing")
   }
 }
