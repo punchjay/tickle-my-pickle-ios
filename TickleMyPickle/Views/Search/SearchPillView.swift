@@ -24,7 +24,8 @@ struct SearchPillView: View {
               .foregroundStyle(Semantic.primary)
           }
         }
-        .frame(width: 28, height: 28)
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
         .disabled(blocked)
         .accessibilityLabel(AppCopy.Search.submitLabel)
 
@@ -59,15 +60,18 @@ struct SearchPillView: View {
             .font(AppFont.bodyMedium(14))
         }
         .foregroundStyle(Semantic.link)
+        // Padding inside the label so it counts toward the 44pt tap target.
+        .padding(.horizontal, 10)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
       }
       .disabled(blocked)
-      .padding(.horizontal, 10)
-      .padding(.vertical, 8)
     }
     .buttonStyle(.plain)
-    .padding(.leading, 12)
+    // The buttons are 44pt tall now, so the pill needs no vertical padding,
+    // and the search icon's wider frame takes up most of the leading inset.
+    .padding(.leading, 4)
     .padding(.trailing, 10)
-    .padding(.vertical, 4)
     .background(Color.white)
     .clipShape(Capsule())
     .overlay(Capsule().stroke(Semantic.borderSoft, lineWidth: 1))

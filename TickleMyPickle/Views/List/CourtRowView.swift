@@ -34,14 +34,20 @@ struct CourtRowView: View {
           .font(AppFont.display(20))
           .foregroundStyle(Semantic.text)
           .lineLimit(1)
+          // The whole row selects on tap, but VoiceOver needs one element to
+          // activate; the name is what it reads first.
+          .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+          .accessibilityAction { onSelect() }
 
         if !highConfidenceTags.isEmpty {
           HStack(spacing: 4) {
             ForEach(highConfidenceTags, id: \.kind) { tag in
               AmenityBadgeView(kind: tag.kind)
+                // On each badge rather than the row: a label on the HStack
+                // replaced every badge's name with the disclaimer.
+                .accessibilityHint(AppCopy.Amenities.disclaimer)
             }
           }
-          .accessibilityLabel(AppCopy.Amenities.disclaimer)
         }
 
         if !court.address.isEmpty {
@@ -67,8 +73,13 @@ struct CourtRowView: View {
           Text(AppCopy.CourtList.directions)
             .font(AppFont.bodyMedium(13))
             .foregroundStyle(Semantic.link)
+            // A 44pt-tall tap target; the negative padding below gives the
+            // space back so the row doesn't grow.
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .padding(.vertical, -14)
         .padding(.top, 2)
       }
 
@@ -77,8 +88,17 @@ struct CourtRowView: View {
       Button(action: onToggleFavorite) {
         Image(systemName: isFavorite ? "star.fill" : "star")
           .foregroundStyle(isFavorite ? Semantic.primary : Semantic.textMuted)
+          .frame(width: 44, height: 44)
+          .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
+      // Keep the icon where it was: the 44pt frame reaches into the row's
+      // padding, and only as far left as the HStack spacing, so it can't
+      // overlap the court name.
+      .padding(.top, -12)
+      .padding(.trailing, -12)
+      .padding(.leading, -10)
+      .padding(.bottom, -12)
       .accessibilityLabel(isFavorite ? AppCopy.CourtList.unsave : AppCopy.CourtList.save)
     }
     .padding(12)
