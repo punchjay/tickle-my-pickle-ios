@@ -55,16 +55,6 @@ final class AccessibilityUITests: XCTestCase {
   /// Audit findings that exist today, as (type, element label). Anything not
   /// listed here fails the audit tests. Remove an entry once it's fixed.
   private let knownAuditIssues: [(XCUIAccessibilityAuditType, String)] = [
-    // Too-small touch target; see testTouchTargetsAreAtLeast44Points.
-    (.hitRegion, "Nearby"),
-    // Low contrast; see AccessibilityColorTests.testKnownLowContrastPairings.
-    (.contrast, "Find pickleball courts near you"),
-    (.contrast, "1471 NW 67th St"),
-    (.contrast, "7201 E Green Lake Dr N"),
-    (.contrast, "★ 4.7  (128)"),
-    (.contrast, "★ 4.5  (96)"),
-    // Number badges on rows and map pins: white on terracotta.
-    (.contrast, "1"), (.contrast, "2"), (.contrast, "3"), (.contrast, "4"), (.contrast, "5"),
     // Amenity badges scale with Dynamic Type, but the audit still reports
     // partial support. It couldn't see them while they were labeled with the
     // disclaimer. Not truncation, the capsule clip, or the text-style curve
