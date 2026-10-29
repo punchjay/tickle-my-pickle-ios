@@ -49,7 +49,8 @@ struct CourtMapView: View {
   var body: some View {
     Map(position: $cameraPosition, selection: $mapSelection) {
       ForEach(Array(courts.enumerated()), id: \.element.id) { index, court in
-        Annotation(court.name, coordinate: court.location.coordinate) {
+        // The pin's tip marks the court.
+        Annotation(court.name, coordinate: court.location.coordinate, anchor: .bottom) {
           CourtPinView(number: index + 1, selected: court.id == selectedId)
         }
         .tag(court.id)
