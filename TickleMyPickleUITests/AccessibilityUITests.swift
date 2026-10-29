@@ -116,15 +116,10 @@ final class AccessibilityUITests: XCTestCase {
       // control comes before its text in the tree, so firstMatch is the
       // tappable one.
       app.descendants(matching: .any)["Directions"].firstMatch,
+      app.buttons["Nearby"],
+      app.buttons["Saved"],
     ] {
       assertTarget(element)
-    }
-
-    // Too small today (33pt tall): the tab bar was kept at its original height.
-    for (name, element) in [("Nearby tab", app.buttons["Nearby"]), ("Saved tab", app.buttons["Saved"])] {
-      XCTExpectFailure("Known small touch target: \(name)") {
-        assertTarget(element)
-      }
     }
   }
 

@@ -87,7 +87,7 @@ struct CourtRowView: View {
 
       Button(action: onToggleFavorite) {
         Image(systemName: isFavorite ? "star.fill" : "star")
-          .foregroundStyle(isFavorite ? Semantic.primary : Semantic.textMuted)
+          .foregroundStyle(isFavorite ? Semantic.primaryHover : Semantic.textMuted)
           .frame(width: 44, height: 44)
           .contentShape(Rectangle())
       }

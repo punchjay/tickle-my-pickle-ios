@@ -80,8 +80,12 @@ struct CourtListView: View {
         .foregroundStyle(tab == target ? Semantic.text : Semantic.textMuted)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
+        .frame(minHeight: 44)
         .background(tab == target ? Palette.ivory : Color.clear)
         .clipShape(RoundedRectangle(cornerRadius: Radii.sm))
+        // The unselected tab's background is clear, which isn't hit-testable,
+        // so without this only the label itself takes taps.
+        .contentShape(RoundedRectangle(cornerRadius: Radii.sm))
         // `.plain` + an explicit foregroundStyle suppresses SwiftUI's automatic
         // dimming, so the disabled look has to be spelled out.
         .opacity(disabled ? 0.4 : 0.8)

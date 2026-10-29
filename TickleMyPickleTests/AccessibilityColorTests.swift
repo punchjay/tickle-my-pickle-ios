@@ -51,6 +51,9 @@ final class AccessibilityColorTests: XCTestCase {
       Pairing(
         "Search icon (SearchPillView)", Semantic.primaryHover, on: .white,
         minimum: WCAG.largeTextAndUIMinimum),
+      Pairing(
+        "Filled star (CourtRowView)", Semantic.primaryHover, on: Semantic.card,
+        minimum: WCAG.largeTextAndUIMinimum),
       Pairing("\"Near me\" (SearchPillView)", Semantic.link, on: .white),
       Pairing("\"Directions\" link (CourtRowView)", Semantic.link, on: Semantic.card),
       Pairing("\"Open now\" (CourtRowView)", Semantic.open, on: Semantic.card),
@@ -83,10 +86,6 @@ final class AccessibilityColorTests: XCTestCase {
       Pairing(
         "Unselected tab (CourtListView, 0.8 opacity)", Semantic.textMuted, on: Semantic.bg,
         opacity: 0.8, over: Semantic.bg),
-      // 2.71:1
-      Pairing(
-        "Filled star (CourtRowView)", Semantic.primary, on: Semantic.card,
-        minimum: WCAG.largeTextAndUIMinimum),
     ]
     for pairing in known {
       XCTExpectFailure("Known low contrast: \(pairing.use)") {
