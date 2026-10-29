@@ -14,9 +14,9 @@ struct CourtPinView: View {
   var body: some View {
     ZStack {
       Circle()
-        .fill(selected ? Palette.midnight : Palette.terracotta)
+        .fill(selected ? Palette.midnight : Palette.terracottaDeep)
         .overlay(
-          Circle().stroke(selected ? Palette.midnight : Palette.terracottaDark, lineWidth: 2),
+          Circle().stroke(selected ? Palette.midnight : Palette.terracottaDeep, lineWidth: 2),
         )
       Text("\(number)")
         .font(.footnote.bold())

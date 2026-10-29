@@ -5,11 +5,6 @@ import XCTest
 /// WCAG AA contrast for every foreground/background pairing the views actually
 /// draw. Each case names the view that uses it, so a palette tweak that breaks
 /// legibility points straight at the screen it hurts.
-///
-/// Pairings that fail today are listed in `testKnownLowContrastPairings`
-/// under `XCTExpectFailure`: the suite stays green, and each one turns into a
-/// failure ("expected failure but none occurred") as soon as it's fixed, so
-/// it can be moved up into the passing list.
 final class AccessibilityColorTests: XCTestCase {
   private struct Pairing {
     let use: String
@@ -64,33 +59,17 @@ final class AccessibilityColorTests: XCTestCase {
       Pairing("Outdoor/Free badge (AmenityBadgeView)", Palette.midnight, on: Palette.lime),
       Pairing("Lighted badge (AmenityBadgeView)", Palette.midnight, on: Palette.sunshine),
       Pairing("Selected pin number (CourtPinView)", .white, on: Palette.midnight),
+      Pairing("Row number (CourtRowView)", .white, on: Palette.terracottaDeep),
+      Pairing("Pin number (CourtPinView)", .white, on: Palette.terracottaDeep),
+      Pairing("Star rating (CourtRowView)", Palette.marigoldDeep, on: Semantic.card),
+      Pairing("Selected tab (CourtListView)", Semantic.text, on: Palette.ivory),
+      // The tab's own background is clear, so the list's shows through.
       Pairing(
-        "Selected tab (CourtListView, 0.8 opacity)", Semantic.text, on: Palette.ivory,
-        opacity: 0.8, over: Semantic.bg),
+        "Unselected tab (CourtListView, 0.75 opacity)", Semantic.text, on: Semantic.bg,
+        opacity: 0.75, over: Semantic.bg),
     ]
     for pairing in pairings {
       pairing.check()
-    }
-  }
-
-  /// Each fails AA today. Fix the color, then move the pairing up into
-  /// `testTextAndIconsMeetAAContrast`.
-  func testKnownLowContrastPairings() {
-    let known = [
-      // 2.19:1
-      Pairing("Star rating (CourtRowView)", Palette.marigold, on: Semantic.card),
-      // 2.93:1 -- 13pt bold isn't large text, so it needs 4.5.
-      Pairing("Row number (CourtRowView)", .white, on: Palette.terracotta),
-      Pairing("Pin number (CourtPinView)", .white, on: Palette.terracotta),
-      // 2.74:1. The tab's own background is clear, so the list's shows through.
-      Pairing(
-        "Unselected tab (CourtListView, 0.8 opacity)", Semantic.textMuted, on: Semantic.bg,
-        opacity: 0.8, over: Semantic.bg),
-    ]
-    for pairing in known {
-      XCTExpectFailure("Known low contrast: \(pairing.use)") {
-        pairing.check()
-      }
     }
   }
 }

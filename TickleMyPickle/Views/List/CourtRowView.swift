@@ -21,7 +21,7 @@ struct CourtRowView: View {
     HStack(alignment: .top, spacing: 10) {
       if let number {
         ZStack {
-          Circle().fill(selected ? Palette.midnight : Palette.terracotta)
+          Circle().fill(selected ? Palette.midnight : Palette.terracottaDeep)
           Text("\(number)")
             .font(AppFont.bodyBold(13))
             .foregroundStyle(.white)
@@ -60,7 +60,7 @@ struct CourtRowView: View {
         if let rating = court.rating {
           Text(ratingLine(rating))
             .font(AppFont.bodyMedium(13))
-            .foregroundStyle(Palette.marigold)
+            .foregroundStyle(Palette.marigoldDeep)
         }
 
         if let isOpen = court.isOpen {

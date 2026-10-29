@@ -77,7 +77,7 @@ struct CourtListView: View {
     } label: {
       Text(label)
         .font(AppFont.bodyBold(13))
-        .foregroundStyle(tab == target ? Semantic.text : Semantic.textMuted)
+        .foregroundStyle(tab == target ? Semantic.text : Semantic.text.opacity(0.75))
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
         .frame(minHeight: 44)
@@ -88,7 +88,7 @@ struct CourtListView: View {
         .contentShape(RoundedRectangle(cornerRadius: Radii.sm))
         // `.plain` + an explicit foregroundStyle suppresses SwiftUI's automatic
         // dimming, so the disabled look has to be spelled out.
-        .opacity(disabled ? 0.4 : 0.8)
+        .opacity(disabled ? 0.4 : 1)
     }
     .buttonStyle(.plain)
     .disabled(disabled)

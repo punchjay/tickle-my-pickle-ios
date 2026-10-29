@@ -21,7 +21,9 @@ enum Palette {
   static let surface = Color(hex: "#FBF6EA") // cards, panels
   static let terracotta = Color(hex: "#E07C53") // primary action (grip/border)
   static let terracottaDark = Color(hex: "#C4633D") // primary hover/active
-  static let marigold = Color(hex: "#E29A33") // ratings, secondary accent
+  static let terracottaDeep = Color(hex: "#B5532F") // number badges/pins (white text at AA)
+  static let marigold = Color(hex: "#E29A33") // secondary accent
+  static let marigoldDeep = Color(hex: "#9A6110") // rating text (AA on cards)
   static let tomato = Color(hex: "#C8442B") // alerts / strong accent
   static let courtBlue = Color(hex: "#2E5A86") // links, map UI
   static let midnight = Color(hex: "#1E2D49") // primary text / dark buttons
