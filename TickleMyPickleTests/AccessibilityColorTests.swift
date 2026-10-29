@@ -47,6 +47,10 @@ final class AccessibilityColorTests: XCTestCase {
       Pairing("Body text on cards (CourtRowView, error banner)", Semantic.text, on: Semantic.card),
       Pairing("Typed search text (SearchPillView)", Semantic.text, on: .white),
       Pairing("Search placeholder (SearchPillView)", Semantic.textMuted, on: .white),
+      Pairing("Tagline and addresses (HeaderCardView, CourtRowView)", Semantic.textMuted, on: Semantic.card),
+      Pairing(
+        "Search icon (SearchPillView)", Semantic.primaryHover, on: .white,
+        minimum: WCAG.largeTextAndUIMinimum),
       Pairing("\"Near me\" (SearchPillView)", Semantic.link, on: .white),
       Pairing("\"Directions\" link (CourtRowView)", Semantic.link, on: Semantic.card),
       Pairing("\"Open now\" (CourtRowView)", Semantic.open, on: Semantic.card),
@@ -70,8 +74,6 @@ final class AccessibilityColorTests: XCTestCase {
   /// `testTextAndIconsMeetAAContrast`.
   func testKnownLowContrastPairings() {
     let known = [
-      // 4.25:1 -- needs a slightly darker caramel for text on cream.
-      Pairing("Tagline and addresses (HeaderCardView, CourtRowView)", Semantic.textMuted, on: Semantic.card),
       // 2.19:1
       Pairing("Star rating (CourtRowView)", Palette.marigold, on: Semantic.card),
       // 2.93:1 -- 13pt bold isn't large text, so it needs 4.5.
@@ -81,10 +83,6 @@ final class AccessibilityColorTests: XCTestCase {
       Pairing(
         "Unselected tab (CourtListView, 0.8 opacity)", Semantic.textMuted, on: Semantic.bg,
         opacity: 0.8, over: Semantic.bg),
-      // 2.93:1 -- icons only need 3:1, and this just misses.
-      Pairing(
-        "Search icon (SearchPillView)", Semantic.primary, on: .white,
-        minimum: WCAG.largeTextAndUIMinimum),
       // 2.71:1
       Pairing(
         "Filled star (CourtRowView)", Semantic.primary, on: Semantic.card,

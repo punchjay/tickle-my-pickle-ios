@@ -24,7 +24,7 @@ struct SearchPillView: View {
               .tint(Semantic.primary)
           } else {
             Image(systemName: "magnifyingglass")
-              .foregroundStyle(Semantic.primary)
+              .foregroundStyle(Semantic.primaryHover)
           }
         }
         .frame(width: 44, height: 44)
