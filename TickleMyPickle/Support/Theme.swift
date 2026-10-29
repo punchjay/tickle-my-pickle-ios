@@ -25,7 +25,7 @@ enum Palette {
   static let tomato = Color(hex: "#C8442B") // alerts / strong accent
   static let courtBlue = Color(hex: "#2E5A86") // links, map UI
   static let midnight = Color(hex: "#1E2D49") // primary text / dark buttons
-  static let caramel = Color(hex: "#9C6B3C") // muted labels, hairlines
+  static let caramel = Color(hex: "#946538") // muted labels, hairlines (darkened from #9C6B3C for AA on cream)
   static let lime = Color(hex: "#CFE24A") // "free" / open pop
   static let sunshine = Color(hex: "#F4D62E") // "lighted" / highlight pop
 }
