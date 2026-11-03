@@ -16,4 +16,7 @@ enum Confidence: Int, Sendable {
 struct Tag: Sendable {
   let kind: AmenityKind
   let confidence: Confidence
+  /// True when the court's reviews settled this kind, false for a name-based
+  /// guess. Picks which disclaimer the badge carries.
+  var fromReviews = false
 }

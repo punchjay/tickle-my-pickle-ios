@@ -34,6 +34,8 @@ enum AppCopy {
     static let lighted = "Lighted"
     static let free = "Free"
     static let disclaimer = "Tags are best guesses from the listing name"
+    /// iOS only: for a badge the court's reviews settled (see Amenities.swift).
+    static let fromReviews = "From the court's Google reviews"
 
     static func label(for kind: AmenityKind) -> String {
       switch kind {
@@ -58,7 +60,9 @@ enum AppCopy {
     static let noCourtsFound = "No pickleball courts found nearby. Try a different location."
     static let searchFailed = "Search failed. Please try again."
     static let locationNotFound = "Could not find that location. Try again."
-    static let geolocationDenied = "Location access denied. Enter a zip code instead."
-    static let geolocationUnavailable = "Couldn't get your location. Try again or enter a zip code."
+    static let geolocationDenied =
+      "Location access is blocked. Allow it in Settings, or search by city or ZIP."
+    static let geolocationUnavailable =
+      "Couldn't determine your location. Search by city or ZIP instead."
   }
 }
