@@ -71,6 +71,9 @@ final class AccessibilityUITests: XCTestCase {
     // Court blue on white measures 7.2:1 (AccessibilityColorTests); the audit
     // seems to sample the pill's shadow or border instead.
     (.contrast, "Near me"),
+    // White on terracottaDeep measures ~5:1 (AccessibilityColorTests), but on
+    // iOS 27 the audit sometimes flags map pin 4 and passes it on a rerun.
+    (.contrast, "4"),
     // Single-line names, addresses, and the placeholder are truncated on
     // purpose to keep rows and the pill a fixed height.
     (.textClipped, "Search location"),
