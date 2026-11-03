@@ -54,6 +54,15 @@ final class AmenitiesTests: XCTestCase {
     )
     XCTAssertTrue(tags.contains { $0.kind == .indoor && $0.confidence == .high })
     XCTAssertTrue(tags.contains { $0.kind == .lighted && $0.confidence == .high })
+    XCTAssertTrue(tags.allSatisfy(\.fromReviews))
+  }
+
+  func testNameBasedGuessesAreNotMarkedAsFromReviews() {
+    let tags = Amenities.inferAmenities(
+      for: court("Riverside Park", types: ["park"], reviews: ReviewAmenities(lighted: true)),
+    )
+    XCTAssertEqual(tags.first { $0.kind == .lighted }?.fromReviews, true)
+    XCTAssertEqual(tags.first { $0.kind == .outdoor }?.fromReviews, false)
   }
 
   func testReviewNoRemovesTheNameBasedGuess() {

@@ -42,7 +42,7 @@ enum Amenities {
     ]
     return answers.compactMap { kind, answer in
       switch answer {
-      case true?: Tag(kind: kind, confidence: .high)
+      case true?: Tag(kind: kind, confidence: .high, fromReviews: true)
       case false?: nil
       case nil: guessed.first { $0.kind == kind }
       }

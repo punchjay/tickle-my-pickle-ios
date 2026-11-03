@@ -45,7 +45,8 @@ struct CourtRowView: View {
               AmenityBadgeView(kind: tag.kind)
                 // On each badge rather than the row: a label on the HStack
                 // replaced every badge's name with the disclaimer.
-                .accessibilityHint(AppCopy.Amenities.disclaimer)
+                .accessibilityHint(
+                  tag.fromReviews ? AppCopy.Amenities.fromReviews : AppCopy.Amenities.disclaimer)
             }
           }
         }

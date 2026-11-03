@@ -53,6 +53,10 @@ struct CourtListView: View {
           }
           .padding(12)
         }
+        // Like the web app's aria-label on the Nearby list: VoiceOver names
+        // the list with its count. `.contain` keeps the rows reachable.
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(tab == .nearby ? AppCopy.CourtList.heading(courts.count) : "")
         // Scroll the selected court into view (Nearby tab only), mirroring
         // the original app's scrollIntoView behavior.
         .onChange(of: selectedCourt?.id) { _, newValue in
